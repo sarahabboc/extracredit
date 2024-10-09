@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hotdog Stand</title>
+
+<style type="text/css">
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .item {
+        width: 110px; display:inline-block;
+    }
+    .price {
+        width: 100px; display:inline-block; text-align:right;
+    }
+</style>
+
+</head>
+
+<body>
+    <h1 style='color:rgb(43, 67, 226);text-align:center'> Joe's HotDog Stand </h1>
+    <p style='color:brown; font-size:25px; font-weight:bold'> Menu</p>
+    <p style='color:black; font-size:25px; font-weight:bold'> Hotdogs: 4.80</p>
+    <p style='color:black; font-size:25px; font-weight:bold'> French Fries: 3.95</p>
+    <p style='color:black; font-size:25px; font-weight:bold'> Drinks: 1.99</p>
+    <button onclick="displayMenu()">Order Here</button>
+
+
+    <p id="order-summary"></p>
+
+    <script>
+        // Associative array for item prices
+        const prices = {
+            "Hotdogs": 4.80,
+            "French Fries": 3.95,
+            "Drinks": 1.99
+        };
+
+        // Associative array for item quantities (to be filled by user input)
+        const quantities = {
+            "Hotdogs": 0,
+            "French Fries": 0,
+            "Drinks": 0
+        };
+
+        // Function to format prices as dollars and cents
+        function showPrices(price) {
+            let priceString = price.toString();
+            let parts = priceString.split('.');
+
+            if (parts.length === 1) {
+                return '$' + priceString + '.00';
+            }
+
+            if (parts[1].length === 1) {
+                return '$' + priceString + '0';
+            }
+
+            return '$' + priceString;
+        }
+
+        // Rounding function to ensure consistent 2 decimal place rounding
+        function showMoney(amount) {
+            return Math.round(amount * 100) / 100;
+        }
+
+        // Displaying the order and calculating the total
+        function displayMenu() {
+            // Loop to get quantities from the user
+            for (let item in quantities) {
+                quantities[item] = parseInt(prompt(`How many ${item} would you like?`, 0)); 
+            }
+
+            // Calculate the total (before discount) using a loop
+            let totalBeforeDiscount = 0;
+            for (let item in quantities) {
+                totalBeforeDiscount += quantities[item] * prices[item];
+            }
+            totalBeforeDiscount = showMoney(totalBeforeDiscount); // Round to two decimals
+
+            // Calculate discount if applicable
+            let discount = 0;
+            if (totalBeforeDiscount >= 25) {
+                discount = totalBeforeDiscount * 0.10;
+            }
+            discount = showMoney(discount);
+
+            // Total after discount
+            let totalAfterDiscount = totalBeforeDiscount - discount;
+            totalAfterDiscount = showMoney(totalAfterDiscount); // Round it
+
+            // Massachusetts tax
+            const MASStax = 0.0625;
+            let tax = totalAfterDiscount * MASStax;
+            tax = showMoney(tax); // Round it
+
+            // Final total after tax
+            let finalTotal = totalAfterDiscount + tax;
+            finalTotal = showMoney(finalTotal); // Round it
+
+            // Construct the order summary using a loop
+            let orderSummary = `<strong>Order Summary:</strong><br><br>`;
+            for (let item in quantities) {
+                let itemTotal = showMoney(quantities[item] * prices[item]);
+                orderSummary += `${item}: ${quantities[item]} x ${showPrices(prices[item])} = ${showPrices(itemTotal)}<br>`;
+            }
+
+            // Add the totals to the order summary
+            orderSummary += `<br>Total (before discount): ${showPrices(totalBeforeDiscount)}<br>`;
+            orderSummary += `Discount: ${showPrices(discount)}<br>`;
+            orderSummary += `Total (after discount): ${showPrices(totalAfterDiscount)}<br>`;
+            orderSummary += `Tax: ${showPrices(tax)}<br>`;
+            orderSummary += `Final Total: ${showPrices(finalTotal)}`;
+
+            // Display the order summary
+            document.getElementById('order-summary').innerHTML = orderSummary;
+        }
+    </script>
+
+</body>
+</html>
